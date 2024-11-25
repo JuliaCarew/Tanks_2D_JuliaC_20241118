@@ -15,10 +15,18 @@ public class PlayerController : MonoBehaviour
     public GameObject bulletPrefab;
     public float bulletSpeed;
     public int bulletLifeTime;
+    [Header("Landmine Variables")]
+    public Transform landmineStartPoint;
+    public GameObject landminePrefab;
+    public GameObject landmineRadiusVisual;
+    public float landmineLifetime = 3f;
+    float landmineCooldown = 10f; // can only be placed every 10 seconds
+    private float timer;
 
     private HealthSystem healthSystem;
     void Start()
     {
+        landmineRadiusVisual.SetActive(false);
         healthSystem = GetComponent<HealthSystem>();
     }
     void Update()
@@ -29,6 +37,20 @@ public class PlayerController : MonoBehaviour
         {
             Shoot();
         }
+        if (Input.GetKeyDown("space"))
+        {
+            timer += Time.deltaTime;
+            if (timer >= landmineCooldown)
+            {
+                // disable input
+                return;
+            }
+            else
+            {
+                PlaceLandmine();
+            }
+        }
+
         healthSystem.DetectEnemyHit(); // take dmg if hit by enemy
     }
 
@@ -63,5 +85,16 @@ public class PlayerController : MonoBehaviour
         // Initialize bullets movement with speed & lifetime
         MoveBullet bulletMovement = bullet.GetComponent<MoveBullet>(); 
         bulletMovement.Initialize(shootDirection, bulletSpeed, bulletLifeTime); // Call Initialize() from MoveBullet.cs
+    }
+    void PlaceLandmine()
+    {
+        Debug.Log("Placing landmine");
+        GameObject landmine = Instantiate(landminePrefab, landmineStartPoint.position, Quaternion.identity);
+        //Instantiate(landmineRadiusVisual, landmine.position, Quaternion.identity); 
+        //landmineRadiusVisual.SetActive(true); // place radius at teh instantiated landmine prefab
+
+        //timer += Time.deltaTime;
+
+        //Destroy(landminePrefab, landmineLifetime);
     }
 }

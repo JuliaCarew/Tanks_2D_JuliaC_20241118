@@ -121,6 +121,9 @@ MonoBehaviour:
   maxHealth: 100
   bulletDamage: 10
   enemyDamage: 10
+  landmineDamage: 10
   bulletHitRadius: 1
   enemyHitRadius: 1
+  landmineHitRadius: 5
   bulletPrefab: {fileID: 3081974298468731962, guid: 38886dab916955c4b8d67348660406a9, type: 3}
+  xpPrefab: {fileID: 3513920656347339346, guid: e3c6ae51154985e45ae93005eb26a409, type: 3}

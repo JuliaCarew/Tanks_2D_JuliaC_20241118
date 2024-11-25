@@ -31,10 +31,6 @@ public class EnemyController : MonoBehaviour
         else // If this is an enemy, initialize its HealthSystem
         {
             healthSystem = GetComponent<HealthSystem>();
-            if (healthSystem == null)
-            {
-                Debug.LogError($"{gameObject.name} is missing a HealthSystem component!");
-            }
         }
     }
     void Update()
@@ -45,11 +41,11 @@ public class EnemyController : MonoBehaviour
              // Check for bullet hits using the HealthSystem
             if (healthSystem != null)
             {
-                healthSystem.DetectBullet(); // Ensure HealthSystem is properly assigned & take dmg if hit by bullet
+                healthSystem.DetectBullet(); 
             }
         }
     }
-
+    // ---------- SPAWN ENEMY WAVES ---------- //
     // Coroutine to spawn enemies around the player at regular intervals
     IEnumerator SpawnEnemyWaves()
     {
@@ -59,7 +55,7 @@ public class EnemyController : MonoBehaviour
             {
                 Vector3 spawnPosition = GetRandomOutsideRadius();
                 GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
-                // because instantiated enemies will have this script
+                // because instantiated prefab enemies will have this script w/o player reference
                 EnemyController enemyController = enemy.GetComponent<EnemyController>(); 
                 if (enemyController != null)
                 {
@@ -72,6 +68,7 @@ public class EnemyController : MonoBehaviour
             yield return new WaitForSeconds(spawnInterval); // coroutine method to spawn only at set interval
         }
     }
+    // ---------- RND SPAWN IN RADIUS ---------- //
     // Calculates a random spawn position outside a radius around the player
     private Vector3 GetRandomOutsideRadius()
     {
@@ -83,6 +80,7 @@ public class EnemyController : MonoBehaviour
 
         return new Vector3(x,y,0);
     }
+    // ---------- ENEMY CHASE ---------- //
     // Makes the enemy chase the player by moving and rotating towards them
     private void ChasePlayer()
     {
