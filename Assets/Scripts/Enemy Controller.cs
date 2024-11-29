@@ -4,19 +4,22 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    // Main variables
     [Header("Main Variables")]
     public GameObject player;
-    public float speed = 1f;
-    // Spawning variables
-    [Header("Spawning Variables")]
-    public GameObject enemyPrefab;
-    public int initialSpawnCount = 5; 
-    public float spawnInterval = 10f; // seconds between waves
-    public float difficultyIncreaseRate = 1.2f; // by  __% in decimal
-    public float spawnRadius = 10f; // for player radius check
+    public Transform enemyAim;
+    private float speed = 1f;
 
-    public int currentSpawnCount; // increments by IncreaseRate at Interval
+    [Header("Enemies")]
+    public GameObject enemyPrefab;
+    public GameObject enemyAimPrefab;
+
+    [Header("Spawning")]
+    private int initialSpawnCount = 5; 
+    private float spawnInterval = 10f; // seconds between waves
+    private float difficultyIncreaseRate = 1.15f; // by  __% in decimal
+    private float spawnRadius = 10f; // for player radius check
+    private int currentSpawnCount; // increments by IncreaseRate at Interval
+
     private HealthSystem healthSystem;
 
     void Start()
@@ -37,11 +40,15 @@ public class EnemyController : MonoBehaviour
     {
         if (!gameObject.CompareTag("Spawner")) // if it's an enemy
         {
-            ChasePlayer();
-             // Check for bullet hits using the HealthSystem
+            if (player != null)
+            {
+                ChasePlayer();
+            }
+             // Check for bullet/landmine hits using the HealthSystem
             if (healthSystem != null)
             {
                 healthSystem.DetectBullet(); 
+                healthSystem.DetectLandmine();
             }
         }
     }
@@ -55,13 +62,20 @@ public class EnemyController : MonoBehaviour
             {
                 Vector3 spawnPosition = GetRandomOutsideRadius();
                 GameObject enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+                
+                // instantiate enemy aim arrow & parent it so follows position while also rotating alone
+                GameObject aimObject = Instantiate(enemyAimPrefab, spawnPosition, Quaternion.identity);
+                aimObject.transform.parent = enemy.transform;
+                aimObject.transform.localPosition = Vector3.zero;
+                
                 // because instantiated prefab enemies will have this script w/o player reference
                 EnemyController enemyController = enemy.GetComponent<EnemyController>(); 
                 if (enemyController != null)
                 {
                     enemyController.player = player; // assign the prefab's player object to this one
+                    enemyController.enemyAim = aimObject.transform;
                 }
-                Debug.Log("Enemy spawned");
+                //Debug.Log("Enemy spawned");
             }
             // increment enemies spawned by difficulty multiplier
             currentSpawnCount = Mathf.CeilToInt(currentSpawnCount * difficultyIncreaseRate); 
@@ -72,6 +86,11 @@ public class EnemyController : MonoBehaviour
     // Calculates a random spawn position outside a radius around the player
     private Vector3 GetRandomOutsideRadius()
     {
+        if (player == null)
+        {
+            return Vector3.zero;
+        }
+
         float angle = Random.Range(0f, 360f); // circle radius angles
         float distance = Random.Range(spawnRadius, spawnRadius + 5f); // distance in the radius
 
@@ -84,11 +103,31 @@ public class EnemyController : MonoBehaviour
     // Makes the enemy chase the player by moving and rotating towards them
     private void ChasePlayer()
     {
+        if (player == null)
+        {
+            return;
+        }
+
         Vector2 direction = (player.transform.position - transform.position).normalized;
-
-        float angleToPlayer = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
         transform.position = Vector2.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(Vector3.forward * angleToPlayer);
+
+        if (enemyAim != null)
+        {
+            Vector2 aimDirection = (player.transform.position - enemyAim.position).normalized;
+            float angleToPlayer = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+
+            enemyAim.rotation = Quaternion.Euler(0, 0, angleToPlayer);
+        }  
+    }
+    // ---------- RESET ALL ---------- //
+    public void ResetSpawns()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            Destroy(enemy);
+        }
+        
+        currentSpawnCount = initialSpawnCount;
     }
 }

@@ -5,28 +5,28 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
-    // Movement variables
-    [Header("Movement Variables")]
+    [Header("Movement")]
     public float speed =1f;
     public Camera cam;
-    // Bullet Variables
-    [Header("Bullet Variables")]
+    
+    [Header("Bullets")]
     public Transform bulletStartPoint;
     public GameObject bulletPrefab;
     public float bulletSpeed;
     public int bulletLifeTime;
-    [Header("Landmine Variables")]
+    
+    [Header("Landmines")]
     public Transform landmineStartPoint;
     public GameObject landminePrefab;
     public GameObject landmineRadiusVisual;
-    public float landmineLifetime = 3f;
-    float landmineCooldown = 10f; // can only be placed every 10 seconds
+    private float landmineLifetime = 3f;
+    private float landmineCooldown = 10f; // can only be placed every 10 seconds
     private float timer;
 
     private HealthSystem healthSystem;
+
     void Start()
     {
-        landmineRadiusVisual.SetActive(false);
         healthSystem = GetComponent<HealthSystem>();
     }
     void Update()
@@ -40,9 +40,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown("space"))
         {
             timer += Time.deltaTime;
-            if (timer >= landmineCooldown)
+            if (timer >= landmineCooldown) // disable input
             {
-                // disable input
                 return;
             }
             else
@@ -52,25 +51,27 @@ public class PlayerController : MonoBehaviour
         }
 
         healthSystem.DetectEnemyHit(); // take dmg if hit by enemy
+        UpdateAimRotation();
     }
-
+    // ---------- MOVING ---------- //
     // Updates the player's position based on input and rotates the player to face the mouse
     void UpdatePlayerPosition()
     {
         Vector3 playerInput = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0);
 
-        transform.position = transform.position + playerInput.normalized * speed * Time.deltaTime;
-
+        transform.position += playerInput.normalized * speed * Time.deltaTime;
+    }
+    // ---------- AIMING ---------- //
+    void UpdateAimRotation()
+    {
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        //Debug.Log($"Got mouse position at  [{mousePos.y}], [{mousePos.x}]");
 
         Vector2 lookDirection = mousePos - (Vector2)transform.position;
         float lookAngle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
 
-        transform.rotation = Quaternion.Euler(0,0, lookAngle);
-        //Debug.Log($"Rotating Player at {lookAngle}");
+        bulletStartPoint.rotation = Quaternion.Euler(0,0, lookAngle);
     }
-
+    // ---------- PROJECTILES ---------- //
     // Instantiates a bullet at the player's shooting point and moves it towards the mouse position
     void Shoot()
     {
@@ -86,15 +87,15 @@ public class PlayerController : MonoBehaviour
         MoveBullet bulletMovement = bullet.GetComponent<MoveBullet>(); 
         bulletMovement.Initialize(shootDirection, bulletSpeed, bulletLifeTime); // Call Initialize() from MoveBullet.cs
     }
+    // ---------- LANDMINE ---------- //
     void PlaceLandmine()
     {
         Debug.Log("Placing landmine");
         GameObject landmine = Instantiate(landminePrefab, landmineStartPoint.position, Quaternion.identity);
-        //Instantiate(landmineRadiusVisual, landmine.position, Quaternion.identity); 
-        //landmineRadiusVisual.SetActive(true); // place radius at teh instantiated landmine prefab
+        
+        GameObject radiusVisual = Instantiate(landmineRadiusVisual, landmineStartPoint.position, Quaternion.identity);
 
-        //timer += Time.deltaTime;
-
-        //Destroy(landminePrefab, landmineLifetime);
+        Destroy(radiusVisual, landmineLifetime);
+        Destroy(landmine, landmineLifetime);
     }
 }
