@@ -5,6 +5,8 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
+    public EnemyController enemyController;
+
     [Header("Movement")]
     public float speed =1f;
     public Camera cam;
@@ -22,6 +24,9 @@ public class PlayerController : MonoBehaviour
     private float landmineLifetime = 3f;
     private float landmineCooldown = 10f; // can only be placed every 10 seconds
     private float timer;
+
+    [Header("Rocket")]
+    public GameObject rocketPrefab;
 
     private HealthSystem healthSystem;
 
@@ -48,6 +53,11 @@ public class PlayerController : MonoBehaviour
             {
                 PlaceLandmine();
             }
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            Debug.Log("Input shoot ROCKET");
+            Rocket();
         }
 
         healthSystem.DetectEnemyHit(); // take dmg if hit by enemy
@@ -98,4 +108,18 @@ public class PlayerController : MonoBehaviour
         Destroy(radiusVisual, landmineLifetime);
         Destroy(landmine, landmineLifetime);
     }
+    // ---------- ROCKET ---------- //
+    void Rocket() // shoots like normal bullets, make homing logic
+    {
+        GameObject enemy = enemyController.enemyPrefab;
+        GameObject rocket = Instantiate(rocketPrefab, bulletStartPoint.position, Quaternion.identity);        
+
+        Vector3 shootDir = (enemy.transform.position - bulletStartPoint.position).normalized;
+
+        MoveBullet bulletMovement = rocket.GetComponent<MoveBullet>(); // change this to homing behavior
+        bulletMovement.Initialize(shootDir, bulletSpeed, bulletLifeTime); 
+    }
 }
+// OK - it's shooting toward enemies but needs to correct its course while flying for the 'homing' effect
+// maybe set up a 'nearest enemy' variable that the homing missile transforms towards mid-flight
+// give rocket a trail renderer with particle system

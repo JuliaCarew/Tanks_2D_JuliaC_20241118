@@ -11,6 +11,7 @@ TagManager:
   - landmine
   - enemyAim
   - landmineRadiusVisual
+  - Rocket
   layers:
   - Default
   - TransparentFX

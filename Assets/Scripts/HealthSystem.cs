@@ -20,6 +20,7 @@ public class HealthSystem : MonoBehaviour
     private float bulletHitRadius = 1.0f; // to get hit detection for enemies taking dmg
     private float enemyHitRadius = 0.5f; // to get hit detection for player taking dmg
     private float landmineHitRadius = 3.0f; // landmine radius detection
+    private float rocketHitRadius = 1.0f; // rocket radius for enemy dmg
 
     [Header("Prefabs")]
     public GameObject bulletPrefab;
@@ -92,13 +93,28 @@ public class HealthSystem : MonoBehaviour
         }
     } 
     // ---------- DETECT LANDMINE (ENEMY) ---------- //
-    public void DetectLandmine() // !!! TEST OUT !!! //
+    public void DetectLandmine() 
     {
         GameObject[] landmines = GameObject.FindGameObjectsWithTag("landmine");
         foreach (var landmine in landmines)
         {
             float distance = Vector2.Distance(transform.position, landmine.transform.position);
             if (distance <= landmineHitRadius)
+            {
+                TakeDamage(landmineDamage); // make it so take dmg only once, then destroy landmine
+                break;
+            }
+        }
+    }
+
+    // ---------- DETECT ROCKET (ENEMY) ---------- //
+    public void DetectRocket() // !!! TEST OUT !!! //
+    {
+        GameObject[] rockets = GameObject.FindGameObjectsWithTag("Rocket");
+        foreach (var rocket in rockets)
+        {
+            float distance = Vector2.Distance(transform.position, rocket.transform.position);
+            if (distance <= rocketHitRadius)
             {
                 TakeDamage(landmineDamage); // make it so take dmg only once, then destroy landmine
                 break;

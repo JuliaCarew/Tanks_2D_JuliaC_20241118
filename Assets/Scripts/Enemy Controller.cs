@@ -49,6 +49,7 @@ public class EnemyController : MonoBehaviour
             {
                 healthSystem.DetectBullet(); 
                 healthSystem.DetectLandmine();
+                healthSystem.DetectRocket();
             }
         }
     }
