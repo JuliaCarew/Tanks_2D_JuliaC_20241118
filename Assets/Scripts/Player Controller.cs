@@ -21,8 +21,8 @@ public class PlayerController : MonoBehaviour
     public Transform landmineStartPoint;
     public GameObject landminePrefab;
     public GameObject landmineRadiusVisual;
-    private float landmineLifetime = 3f;
-    private float landmineCooldown = 10f; // can only be placed every 10 seconds
+    private float landmineLifetime = 3f; // how long landmine is active
+    private float landmineCooldown = 10f; // can only be placed every 10 seconds?
     private float timer;
 
     [Header("Rocket")]
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown("space"))
         {
             timer += Time.deltaTime;
-            if (timer >= landmineCooldown) // disable input
+            if (timer >= landmineCooldown) // disable input?
             {
                 return;
             }
@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviour
         healthSystem.DetectEnemyHit(); // take dmg if hit by enemy
         UpdateAimRotation();
     }
+
     // ---------- MOVING ---------- //
     // Updates the player's position based on input and rotates the player to face the mouse
     void UpdatePlayerPosition()
@@ -71,6 +72,7 @@ public class PlayerController : MonoBehaviour
 
         transform.position += playerInput.normalized * speed * Time.deltaTime;
     }
+
     // ---------- AIMING ---------- //
     void UpdateAimRotation()
     {
@@ -81,6 +83,7 @@ public class PlayerController : MonoBehaviour
 
         bulletStartPoint.rotation = Quaternion.Euler(0,0, lookAngle);
     }
+
     // ---------- PROJECTILES ---------- //
     // Instantiates a bullet at the player's shooting point and moves it towards the mouse position
     void Shoot()
@@ -109,17 +112,28 @@ public class PlayerController : MonoBehaviour
         Destroy(landmine, landmineLifetime);
     }
     // ---------- ROCKET ---------- //
-    void Rocket() // shoots like normal bullets, make homing logic
+    void Rocket() // shoots with homing logic to track the player
     {
-        GameObject enemy = enemyController.enemyPrefab;
-        GameObject rocket = Instantiate(rocketPrefab, bulletStartPoint.position, Quaternion.identity);        
+        // Find the nearest enemy
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        Transform nearestEnemy = null;
+        float closestDistance = Mathf.Infinity;
 
-        Vector3 shootDir = (enemy.transform.position - bulletStartPoint.position).normalized;
+        foreach (GameObject enemy in enemies)
+        {
+            float distance = Vector2.Distance(bulletStartPoint.position, enemy.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                nearestEnemy = enemy.transform;
+            }
+        }
 
-        MoveBullet bulletMovement = rocket.GetComponent<MoveBullet>(); // change this to homing behavior
-        bulletMovement.Initialize(shootDir, bulletSpeed, bulletLifeTime); 
+        // Instantiate the rocket
+        GameObject rocket = Instantiate(rocketPrefab, bulletStartPoint.position, Quaternion.identity);
+
+        // Set the direction and target for the rocket
+        MoveRocket moveRocketref = rocket.GetComponent<MoveRocket>();
+        moveRocketref.Initialize(nearestEnemy, bulletSpeed, bulletLifeTime);
     }
 }
-// OK - it's shooting toward enemies but needs to correct its course while flying for the 'homing' effect
-// maybe set up a 'nearest enemy' variable that the homing missile transforms towards mid-flight
-// give rocket a trail renderer with particle system

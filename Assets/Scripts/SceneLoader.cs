@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
-    //public GameplayUI gameplayUI;
     public GameObject title;
 
     private void Awake()

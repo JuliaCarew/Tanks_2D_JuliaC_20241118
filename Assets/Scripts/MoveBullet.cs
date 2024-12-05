@@ -9,7 +9,7 @@ public class MoveBullet : MonoBehaviour
     private Vector3 direction; 
     private float speed; 
     private float lifeTime; 
-    private float timer; // Timer to track how long the bullet has been active
+    private float timer; // timer to track how long the bullet has been active
 
     public void Initialize(Vector3 shootDirection, float bulletSpeed, float bulletLifeTime)
     {
@@ -23,7 +23,7 @@ public class MoveBullet : MonoBehaviour
     {
         transform.position += direction * speed * Time.deltaTime;
 
-        // Increment the timer and destroy the bullet if it exceeds its lifetime
+        // increment the timer and destroy the bullet if it exceeds its lifetime
         timer += Time.deltaTime;
         if (timer >= lifeTime)
         {

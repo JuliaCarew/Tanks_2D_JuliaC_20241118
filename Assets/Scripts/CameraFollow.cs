@@ -8,14 +8,12 @@ public class CameraFollow : MonoBehaviour
     public float speed;
      private Vector3 offset; // Offset between camera and player
 
-    // Start is called before the first frame update
     void Start()
     {
         // Calculate and store the initial offset between the camera and the player
         offset = transform.position - player.transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (player == null)

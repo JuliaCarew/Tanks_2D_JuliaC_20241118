@@ -44,7 +44,7 @@ public class EnemyController : MonoBehaviour
             {
                 ChasePlayer();
             }
-             // Check for bullet/landmine hits using the HealthSystem
+            // Check for bullet/landmine hits using the HealthSystem
             if (healthSystem != null)
             {
                 healthSystem.DetectBullet(); 
@@ -53,6 +53,7 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
+    
     // ---------- SPAWN ENEMY WAVES ---------- //
     // Coroutine to spawn enemies around the player at regular intervals
     IEnumerator SpawnEnemyWaves()
@@ -83,6 +84,7 @@ public class EnemyController : MonoBehaviour
             yield return new WaitForSeconds(spawnInterval); // coroutine method to spawn only at set interval
         }
     }
+
     // ---------- RND SPAWN IN RADIUS ---------- //
     // Calculates a random spawn position outside a radius around the player
     private Vector3 GetRandomOutsideRadius()
@@ -100,6 +102,7 @@ public class EnemyController : MonoBehaviour
 
         return new Vector3(x,y,0);
     }
+
     // ---------- ENEMY CHASE ---------- //
     // Makes the enemy chase the player by moving and rotating towards them
     private void ChasePlayer()
@@ -120,6 +123,7 @@ public class EnemyController : MonoBehaviour
             enemyAim.rotation = Quaternion.Euler(0, 0, angleToPlayer);
         }  
     }
+
     // ---------- RESET ALL ---------- //
     public void ResetSpawns()
     {

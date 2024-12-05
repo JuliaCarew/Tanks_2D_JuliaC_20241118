@@ -7,6 +7,7 @@ public class HealthSystem : MonoBehaviour
 {
     [Header("References")]
     public GameplayUI gameplayUI;
+    public Leveling levelingref;
 
     [Header("Health")]
     public int maxHealth = 30;
@@ -27,12 +28,13 @@ public class HealthSystem : MonoBehaviour
     public GameObject xpPrefab;
     void Start()
     {
-        currentHealth = maxHealth; // TODO: health always starts at 100 ? and bullet's max dmg is 20 ?
+        currentHealth = maxHealth; 
     }
     public string ShowHUD() // show all healt system variables as UI text
     {
         return $"Health: {currentHealth}/{maxHealth}";
     }
+
     // ---------- DAMAGE ---------- //
     public void TakeDamage(int damage) 
     {
@@ -45,6 +47,7 @@ public class HealthSystem : MonoBehaviour
             Instantiate(xpPrefab, transform.position, Quaternion.identity); // ----- XP!!! ----- //
         }
     }
+
     // ---------- DIE ---------- //
     private void Die() // :P 
     {
@@ -58,9 +61,10 @@ public class HealthSystem : MonoBehaviour
             Destroy(gameObject); // Enemies are destroyed
         }
     }
+
     // ---------- DETECT BULLET (ENEMY) ---------- //
     // Detects if the object is hit by a bullet using Vectors
-    // checks if the bullet is within the hit radius and calls damage
+    // checks if the bullet is within the hit radius and calls damage (true for landmine/rocket)
     public void DetectBullet()
     {
         GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullet");
@@ -76,8 +80,9 @@ public class HealthSystem : MonoBehaviour
             }
         }
     }
+
     // ---------- DETECT ENEMY HIT (PLAYER) ---------- //
-    // Detects if the object is hit by an enemy using Vectors
+    // Detects if the player is hit by an enemy using Vectors
     // checks if the enemy is within the hit radius and calls damage
     public void DetectEnemyHit()
     {
@@ -92,6 +97,7 @@ public class HealthSystem : MonoBehaviour
             }
         }
     } 
+
     // ---------- DETECT LANDMINE (ENEMY) ---------- //
     public void DetectLandmine() 
     {
@@ -108,7 +114,7 @@ public class HealthSystem : MonoBehaviour
     }
 
     // ---------- DETECT ROCKET (ENEMY) ---------- //
-    public void DetectRocket() // !!! TEST OUT !!! //
+    public void DetectRocket() 
     {
         GameObject[] rockets = GameObject.FindGameObjectsWithTag("Rocket");
         foreach (var rocket in rockets)
@@ -121,8 +127,11 @@ public class HealthSystem : MonoBehaviour
             }
         }
     }
+    
     public void ResetHealth()
     {
         currentHealth = maxHealth;
+        Debug.Log($"Health reset to {currentHealth}");
+        levelingref.UpdateUI();
     }
 }

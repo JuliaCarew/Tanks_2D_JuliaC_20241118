@@ -74,7 +74,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 71353e67b196e304787e990cc838f4e3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -101,6 +101,7 @@ MonoBehaviour:
   player: {fileID: 0}
   enemyAim: {fileID: 0}
   enemyPrefab: {fileID: 0}
+  enemyAimPrefab: {fileID: 0}
 --- !u!114 &1484400194914768717
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,8 +119,5 @@ MonoBehaviour:
   bulletDamage: 10
   enemyDamage: 10
   landmineDamage: 10
-  bulletHitRadius: 1
-  enemyHitRadius: 1
-  landmineHitRadius: 5
   bulletPrefab: {fileID: 3081974298468731962, guid: 38886dab916955c4b8d67348660406a9, type: 3}
   xpPrefab: {fileID: 3513920656347339346, guid: e3c6ae51154985e45ae93005eb26a409, type: 3}

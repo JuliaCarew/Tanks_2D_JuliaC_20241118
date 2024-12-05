@@ -8,6 +8,7 @@ public class GameplayUI : MonoBehaviour
     [Header("References")]
     public HealthSystem healthSystem;
     public EnemyController enemySpawner;
+    public Leveling levelingref;
 
     [Header("Ref to Player")]
     public GameObject player;
@@ -15,63 +16,94 @@ public class GameplayUI : MonoBehaviour
     
     [Header("UI Screens")]
     public GameObject gameOverScreen;
-    public GameObject tutorialScreen;
+    public GameObject onScreenWinCondition;
+    public float winConditionDuration = 3f;
+    public GameObject winScreen;
+    public int winLevel = 5; // change to win at diff levels
     void Start()
     {
+        if (onScreenWinCondition != null) // win condition needs to disappear at set time, so coroutine
+        {
+            onScreenWinCondition.SetActive(true);
+            StartCoroutine(HideWinConditionAfterDelay());
+        }
+
         gameOverScreen.SetActive(false);
-        tutorialScreen.SetActive(false);
+        winScreen.SetActive(false);
 
         if (player != null)
             playerStartPosition = player.transform.position;
     }
+
+    void Update() // check level to update winscreen
+    {
+        if (levelingref.level >= winLevel)
+        {
+            winScreen.SetActive(true);
+            Time.timeScale = 0;
+        }
+    }
+
+    // ---------- RESTART GAME ---------- //
     public void Restart()
     {
         Debug.Log("Restart game");
-        // Hide the game over screen and resume the game
-        gameOverScreen.SetActive(false);
         Time.timeScale = 1;
 
-        Leveling leveling = player.GetComponent<Leveling>();
-        if (leveling != null)
+        if (levelingref != null) // reset level
         {
-            leveling.ResetLevel(); 
+            levelingref.ResetLevel(); 
         }
 
-        if (healthSystem != null)
+        if (healthSystem != null) // reset health
         {
             healthSystem.ResetHealth(); 
         }
 
-        // Reset the player's position and re-enable it
-        if (player != null)
+        if (player != null) // re-position & respawn player
         {
             player.transform.position = playerStartPosition;
             player.SetActive(true);
         }
+       
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (var enemy in enemies) // destroy all enemies
+        {
+            Destroy(enemy);
+        }
 
-        // Reset enemy spawns
-        if (enemySpawner != null)
+        if (enemySpawner != null) // reset enemy spawns
         {
             enemySpawner.ResetSpawns(); 
         }
+        
+        gameOverScreen.SetActive(false); // hide the game over screen last
     }
+
+    // ---------- QUIT TO MENU ---------- //
     public void QuitToMenu()
     {
         Debug.Log("Quit to menu");
         SceneManager.LoadScene(0);
     }
-    public void TutorialScreen()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Debug.Log("tutorial screen up");
-            tutorialScreen.SetActive(true);
-        }
-    }
-    public void GameOver() // not triggering
+
+    // ---------- GAME OVER ---------- //
+    public void GameOver() 
     {
         Debug.Log("Game Over");
         gameOverScreen.SetActive(true);
+        levelingref.ResetLevel();
         Time.timeScale = 0;
+    }
+
+    // ---------- WIN CONDITION ---------- //
+    private IEnumerator HideWinConditionAfterDelay()
+    {
+        yield return new WaitForSeconds(winConditionDuration);
+
+        if (onScreenWinCondition != null)
+        {
+            onScreenWinCondition.SetActive(false);
+        }
     }
 }
